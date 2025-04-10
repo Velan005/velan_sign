@@ -23,7 +23,7 @@ const getLocalIP = () => {
 
 const localIP = getLocalIP();
 
-// Configure Socket.IO with broader CORS
+// Configure Socket.IO
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -48,7 +48,7 @@ app.use(express.static(__dirname + '/public'));
 app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io/client-dist'));
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', serverIP: localIP });
+  res.json({ status: 'ok', serverIP: localIP });
 });
 
 io.on('connection', (socket) => {
@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
       const roomId = uuidv4().substring(0, 6);
       const room = {
         id: roomId,
-        users: new Map([[socket.id, { 
+        users: new Map([[socket.id, {
           id: socket.id,
           joinedAt: new Date(),
           lastActive: new Date()
@@ -94,12 +94,12 @@ io.on('connection', (socket) => {
         lastActive: new Date()
       });
       socket.roomId = roomId;
-      callback({ 
+      callback({
         success: true,
         userCount: room.users.size,
         messages: room.messages.slice(-50)
       });
-      socket.to(roomId).emit('userJoined', { 
+      socket.to(roomId).emit('userJoined', {
         userId: socket.id,
         userCount: room.users.size
       });
@@ -132,7 +132,7 @@ io.on('connection', (socket) => {
         if (room.users.size === 0) {
           rooms.delete(socket.roomId);
         } else {
-          socket.to(socket.roomId).emit('userLeft', { 
+          socket.to(socket.roomId).emit('userLeft', {
             userId: socket.id,
             userCount: room.users.size
           });
@@ -149,7 +149,7 @@ io.on('connection', (socket) => {
       if (room.users.size === 0) {
         rooms.delete(roomId);
       } else {
-        socket.to(roomId).emit('userLeft', { 
+        socket.to(roomId).emit('userLeft', {
           userId: socket.id,
           userCount: room.users.size
         });
